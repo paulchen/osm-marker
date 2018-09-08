@@ -9,10 +9,10 @@ import java.util.List;
 
 @Component
 public class MarkerService {
-	@Autowired
-	private MarkerRepository markerRepository;
+    @Autowired
+    private MarkerRepository markerRepository;
 
-	public List<Marker> getAllMarkers() {
-	    return markerRepository.findAll();
-	}
+    public List<Marker> getAllMarkers() {
+        return markerRepository.findAll();
+    }
 }
