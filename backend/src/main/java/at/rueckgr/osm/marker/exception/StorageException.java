@@ -1,4 +1,4 @@
-package at.rueckgr.osm.marker.upload.exception;
+package at.rueckgr.osm.marker.exception;
 
 public class StorageException extends RuntimeException {
 

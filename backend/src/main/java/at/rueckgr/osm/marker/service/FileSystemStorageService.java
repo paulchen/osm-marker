@@ -1,8 +1,7 @@
-package at.rueckgr.osm.marker.upload.service;
+package at.rueckgr.osm.marker.service;
 
-import at.rueckgr.osm.marker.upload.exception.StorageException;
-import at.rueckgr.osm.marker.upload.exception.StorageFileNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import at.rueckgr.osm.marker.exception.StorageException;
+import at.rueckgr.osm.marker.exception.StorageFileNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
