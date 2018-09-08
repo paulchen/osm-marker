@@ -70,7 +70,7 @@ public class AppConfig {
         return properties;
     }
 
-    @Bean
+    @Bean(destroyMethod = "")
     public DataSource dataSource() throws NamingException {
         return (DataSource) new JndiTemplate().lookup(env.getProperty("jdbc.url"));
     }
