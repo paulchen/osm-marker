@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Subject, Observable } from 'rxjs';
 
-const url = 'https://rueckgr.at/~paulchen/upload.php';
+const url = 'http://localhost:8080/osm/uploadFile';
 
 @Injectable()
 export class UploadService {

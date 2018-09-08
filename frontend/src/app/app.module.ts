@@ -17,6 +17,7 @@ import {
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {UploadService} from './upload.service';
+import {MarkerService} from './marker.service';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,7 @@ import {UploadService} from './upload.service';
     MatIconModule,
     MatProgressBarModule
   ],
-  providers: [UploadService],
+  providers: [UploadService, MarkerService],
   bootstrap: [AppComponent],
   entryComponents: [
     DetailsComponent

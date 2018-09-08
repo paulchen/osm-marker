@@ -9,12 +9,12 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +29,7 @@ public class MarkerController {
     @Autowired
     private FileSystemStorageService storageService;
 
+    @CrossOrigin(origins = "*")
     @RequestMapping("/marker")
     public MarkerData getAllMarkers() {
         final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -43,15 +44,15 @@ public class MarkerController {
         return new MarkerData(markerDTOs);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
         storageService.store(file);
 
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
-                .path(file.getName())
-                .toUriString();
-
-        return new UploadFileResponse(file.getName(), fileDownloadUri,
-                file.getContentType(), file.getSize());
+//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path("/downloadFile/")
+//                .path(file.getName())
+//                .toUriString();
+//
+        return new UploadFileResponse(file.getName(), file.getContentType(), file.getSize());
     }}

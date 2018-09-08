@@ -9,7 +9,7 @@ import {Fill, Style, Stroke, Circle as CircleStyle} from 'ol/style';
 import {Overlay} from '@angular/cdk/overlay';
 import {DetailsComponent} from './details.component';
 import {MatDialog} from '@angular/material';
-import {filter} from 'rxjs/operators';
+import {MarkerService} from './marker.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,10 @@ export class AppComponent implements OnInit {
   foo: AppComponent;
   vectorSource: Vector;
 
-  constructor(private overlay: Overlay, private dialog: MatDialog) {
+  constructor(
+      private overlay: Overlay,
+      private dialog: MatDialog,
+      private markerService: MarkerService) {
     this.foo = this;
   }
 
@@ -64,9 +67,9 @@ export class AppComponent implements OnInit {
     //   alert(transform(event.coordinate, 'EPSG:3857', 'EPSG:4326'));
     // });
     //
-    const feature = new Feature({
-      geometry: new Point(fromLonLat([16.37, 48.21]))
-    });
+    // const feature = new Feature({
+    //   geometry: new Point(fromLonLat([16.37, 48.21]))
+    // });
     this.vectorSource = new source.Vector();
     const vector_layer = new Vector({
       source: this.vectorSource,
@@ -81,7 +84,7 @@ export class AppComponent implements OnInit {
     });
     map.addLayer(vector_layer);
 
-    this.vectorSource.addFeature(feature);
+    // this.vectorSource.addFeature(feature);
 
     // map.addInteraction(new Draw({
     //   type: GeometryType.POINT,
@@ -92,6 +95,15 @@ export class AppComponent implements OnInit {
       const coordinates = evt.coordinate;
 
       this.openOverlay(coordinates);
+    });
+
+    this.markerService.getAllMarkers().subscribe(markerData => {
+      markerData.markers.forEach(marker => {
+        const feature = new Feature({
+          geometry: new Point(fromLonLat([marker.longitude, marker.latitude]))
+        });
+        this.vectorSource.addFeature(feature);
+      });
     });
   }
 }
