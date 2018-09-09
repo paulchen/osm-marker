@@ -220,11 +220,6 @@
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="Regexp">
-            <property name="format" value="String\.format"/>
-            <property name="illegalPattern" value="true"/>
-            <property name="ignoreComments" value="true"/>
-        </module>
-        <module name="Regexp">
             <property name="format" value="javax\.transaction\.Transactional"/>
             <property name="illegalPattern" value="true"/>
             <property name="ignoreComments" value="true"/>

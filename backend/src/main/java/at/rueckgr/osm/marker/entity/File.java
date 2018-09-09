@@ -23,4 +23,8 @@ public class File {
     @NotNull
     @Column(nullable = false)
     private String actualFilename;
+
+    @NotNull
+    @Column(nullable = false)
+    private String contentType;
 }

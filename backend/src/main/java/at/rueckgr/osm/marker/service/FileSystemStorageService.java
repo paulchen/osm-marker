@@ -8,19 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
+import java.util.Optional;
+
+import static org.springframework.util.Assert.notNull;
 
 @Service
 public class FileSystemStorageService {
@@ -43,6 +42,8 @@ public class FileSystemStorageService {
     }
 
     public Long store(final MultipartFile file) {
+        notNull(file, "file must not be null");
+
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         try {
             if (file.isEmpty()) {
@@ -57,6 +58,7 @@ public class FileSystemStorageService {
 
             File fileEntity = new File();
             fileEntity.setActualFilename(filename);
+            fileEntity.setContentType(file.getContentType());
             fileEntity = fileRepository.save(fileEntity);
 
             try (InputStream inputStream = file.getInputStream()) {
@@ -71,45 +73,36 @@ public class FileSystemStorageService {
     }
 
     private Path getFilesystemPath(final File fileEntity) {
+        notNull(fileEntity, "fileEntity must not be null");
+        notNull(fileEntity.getId(), "fileEntity must have an id");
+
         final String filename = "file_" + String.format("%05d", fileEntity.getId());
         return this.rootLocation.resolve(filename);
     }
 
-    public Stream<Path> loadAll() {
+    public FileData loadAsResource(final Long id) {
+        notNull(id, "id must not be null");
+
         try {
-            return Files.walk(this.rootLocation, 1)
-                .filter(path -> !path.equals(this.rootLocation))
-                .map(this.rootLocation::relativize);
-        }
-        catch (IOException e) {
-            throw new StorageException("Failed to read stored files", e);
-        }
+            final Optional<File> optionalFile = fileRepository.findById(id);
+            if (!optionalFile.isPresent()) {
+                throw new StorageFileNotFoundException("File not found with id " + id);
+            }
 
-    }
-
-    private Path load(String filename) {
-        return rootLocation.resolve(filename);
-    }
-
-    public Resource loadAsResource(String filename) {
-        try {
-            Path file = load(filename);
-            Resource resource = new UrlResource(file.toUri());
+            final File fileEntity = optionalFile.get();
+            final Path file = getFilesystemPath(fileEntity);
+            final Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
-                return resource;
+                return new FileData(resource, fileEntity.getActualFilename(), fileEntity.getContentType(), Files.size(file));
             }
             else {
                 throw new StorageFileNotFoundException(
-                        "Could not read file: " + filename);
+                        "Could not read file with id " + id);
 
             }
         }
-        catch (MalformedURLException e) {
-            throw new StorageFileNotFoundException("Could not read file: " + filename, e);
+        catch (IOException e) {
+            throw new StorageFileNotFoundException("Could not read file with id " + id, e);
         }
-    }
-
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 }
