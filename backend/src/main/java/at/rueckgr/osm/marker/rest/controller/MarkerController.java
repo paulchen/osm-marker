@@ -86,7 +86,8 @@ public class MarkerController {
                         .peek(file -> file.setMarker(newMarker))
                         .collect(Collectors.toList());
                 newMarker.setFiles(fileList);
-            } else {
+            }
+            else {
                 newMarker.setFiles(Collections.emptyList());
             }
 
