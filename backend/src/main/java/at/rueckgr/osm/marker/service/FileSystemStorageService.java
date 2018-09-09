@@ -38,13 +38,15 @@ public class FileSystemStorageService {
         if (rootLocation == null) {
             try {
                 rootLocation = Paths.get(configurationService.getStringConfiguration(ConfigurationKey.UPLOAD_DIRECTORY));
-            } catch (ConfigurationKeyNotFoundException e) {
+            }
+            catch (ConfigurationKeyNotFoundException e) {
                 throw new StorageException("Upload directory not configured", e);
             }
 
             try {
                 Files.createDirectories(rootLocation);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new StorageException("Could not initialize storage", e);
             }
         }
