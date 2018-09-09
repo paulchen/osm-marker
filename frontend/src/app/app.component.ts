@@ -32,14 +32,18 @@ export class AppComponent implements OnInit {
 
     fileNameDialogRef
       .afterClosed()
-      .subscribe(name => {
-        if (name === 'null' || !name) {
+      .subscribe(data => {
+        if (data === 'null' || !data) {
           return;
         }
 
-        console.log(name);
-        const newFeature = new Feature({geometry: new Point(coordinates)});
-        this.vectorSource.addFeature(newFeature);
+        console.log(data);
+        const transformedCoordinates = transform(coordinates, 'EPSG:3857', 'EPSG:4326');
+        this.markerService.createMarker(data.title, data.files, transformedCoordinates[1], transformedCoordinates[0]).subscribe(() => {
+          const newFeature = new Feature({geometry: new Point(coordinates)});
+          this.vectorSource.addFeature(newFeature);
+        });
+
       });
     // const overlayRef = this.overlay.create({
     //   width: '400px',

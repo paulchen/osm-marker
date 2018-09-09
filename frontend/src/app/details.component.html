@@ -29,19 +29,33 @@
     </button>
   </div>
 
-  <!-- This is the content of the dialog, containing a list of the files to upload -->
-  <mat-dialog-content fxFlex>
-    <mat-list>
-      <mat-list-item *ngFor="let file of files">
-        <h4 mat-line>{{file.name}}</h4>
-        <mat-progress-bar *ngIf="progress" mode="determinate" [value]="progress[file.name].progress | async"></mat-progress-bar>
-      </mat-list-item>
-    </mat-list>
-  </mat-dialog-content>
+  <!--<form [formGroup]="formGroup" (ngSubmit)="submit(formGroup)">-->
+    <!-- This is the content of the dialog, containing a list of the files to upload -->
+    <mat-dialog-content>
+      <p>
+        Lorem ipsum dolor sit amet
+      </p>
+      <div>
+        <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
+      </div>
+      <mat-form-field>
+        <div>
+          <input matInput type="text" placeholder="Enter title" [(ngModel)]="title">
+          <!--<input matInput type="text" formControlName="title" placeholder="Enter title" [(ngModel)]="title">-->
+        </div>
+      </mat-form-field>
+      <mat-list>
+        <mat-list-item *ngFor="let file of files">
+          <h4 mat-line>{{file.name}}</h4>
+          <mat-progress-bar *ngIf="progress" mode="determinate" [value]="progress[file.name].progress | async"></mat-progress-bar>
+        </mat-list-item>
+      </mat-list>
+    </mat-dialog-content>
 
-  <!-- This are the actions of the dialog, containing the primary and the cancel button-->
-  <mat-dialog-actions class="actions">
-    <button *ngIf="showCancelButton" mat-button mat-dialog-close>Cancel</button>
-    <button mat-raised-button color="primary" [disabled]="!canBeClosed" (click)="closeDialog()">{{primaryButtonText}}</button>
-  </mat-dialog-actions>
+    <!-- This are the actions of the dialog, containing the primary and the cancel button-->
+    <mat-dialog-actions class="actions">
+      <button *ngIf="showCancelButton" mat-button mat-dialog-close>Cancel</button>
+      <button mat-raised-button color="primary" [disabled]="!canBeClosed" (click)="closeDialog()">{{primaryButtonText}}</button>
+    </mat-dialog-actions>
+  <!--</form>-->
 </div>

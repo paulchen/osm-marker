@@ -12,7 +12,7 @@ import {forkJoin} from 'rxjs';
 export class DetailsComponent implements OnInit {
   @ViewChild('file') file;
   public files: Set<File> = new Set();
-  public serverFileData: Set<any> = new Set();
+  public serverFileData: Set<number> = new Set();
 
   progress;
   canBeClosed = true;
@@ -20,6 +20,8 @@ export class DetailsComponent implements OnInit {
   showCancelButton = true;
   uploading = false;
   uploadSuccessful = false;
+
+  title = '';
 
   formGroup: FormGroup;
 
@@ -60,7 +62,7 @@ export class DetailsComponent implements OnInit {
     console.log('1');
     // if everything was uploaded already, just close the dialog
     if (this.uploadSuccessful) {
-      return this.dialogRef.close();
+      return this.dialogRef.close({title: this.title, files: this.serverFileData});
     }
 
     // set the component state to "uploading"
@@ -91,15 +93,23 @@ export class DetailsComponent implements OnInit {
 
     // When all progress-observables are completed...
     forkJoin(allProgressObservables).subscribe(end => {
-      // ... the dialog can be closed again...
-      this.canBeClosed = true;
-      this.dialogRef.disableClose = false;
-
-      // ... the upload was successful...
-      this.uploadSuccessful = true;
-
-      // ... and the component is no longer uploading
-      this.uploading = false;
+      this.completeUpload();
     });
+
+    if (this.files.size === 0) {
+      this.completeUpload();
+    }
+  }
+
+  completeUpload(): void {
+    // ... the dialog can be closed again...
+    this.canBeClosed = true;
+    this.dialogRef.disableClose = false;
+
+    // ... the upload was successful...
+    this.uploadSuccessful = true;
+
+    // ... and the component is no longer uploading
+    this.uploading = false;
   }
 }

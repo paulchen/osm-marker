@@ -38,10 +38,11 @@ export class UploadService {
           // pass the percentage into the progress-stream
           progress.next(percentDone);
         } else if (event instanceof HttpResponse) {
+          // TODO check for "ok" status
           console.log(event);
           const wtf = <any>{};
           wtf.abc = event.body;
-          filename.next(wtf.abc);
+          filename.next(wtf.abc.fileData.id);
           filename.complete();
 
           // Close the progress-stream if we get an answer form the API
