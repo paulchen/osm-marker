@@ -4,9 +4,13 @@ import at.rueckgr.osm.marker.component.MarkerService;
 import at.rueckgr.osm.marker.entity.File;
 import at.rueckgr.osm.marker.entity.Marker;
 import at.rueckgr.osm.marker.exception.StorageException;
+import at.rueckgr.osm.marker.rest.dto.FileDTO;
 import at.rueckgr.osm.marker.rest.dto.MarkerDTO;
 import at.rueckgr.osm.marker.rest.dto.MarkerData;
 import at.rueckgr.osm.marker.rest.dto.NewMarkerInput;
+import at.rueckgr.osm.marker.rest.dto.NewMarkerResponse;
+import at.rueckgr.osm.marker.rest.dto.ReturnCode;
+import at.rueckgr.osm.marker.rest.dto.StatusDTO;
 import at.rueckgr.osm.marker.rest.dto.UploadFileResponse;
 import at.rueckgr.osm.marker.service.FileData;
 import at.rueckgr.osm.marker.service.FileSystemStorageService;
@@ -65,32 +69,41 @@ public class MarkerController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/marker")
-    public MarkerDTO saveNewMarker(@RequestBody final NewMarkerInput newMarkerInput) {
-        notNull(newMarkerInput, "newMarkerInput must not be null");
+    public NewMarkerResponse saveNewMarker(@RequestBody final NewMarkerInput newMarkerInput) {
+        try {
+            notNull(newMarkerInput, "newMarkerInput must not be null");
 
-        final Marker newMarker = new Marker();
-        // TODO orika
-        newMarker.setLatitude(newMarkerInput.getLatitude());
-        newMarker.setLongitude(newMarkerInput.getLongitude());
-        newMarker.setName(newMarkerInput.getName());
+            final Marker newMarker = new Marker();
+            // TODO orika
+            newMarker.setLatitude(newMarkerInput.getLatitude());
+            newMarker.setLongitude(newMarkerInput.getLongitude());
+            newMarker.setName(newMarkerInput.getName());
 
-        if (newMarkerInput.getFileIds() != null) {
-            final List<File> fileList = newMarkerInput.getFileIds().stream()
-                    .map(fileId -> storageService.getFileEntity(fileId))
-                    .peek(this::checkNotAssociated)
-                    .peek(file -> file.setMarker(newMarker))
-                    .collect(Collectors.toList());
-            newMarker.setFiles(fileList);
+            if (newMarkerInput.getFileIds() != null) {
+                final List<File> fileList = newMarkerInput.getFileIds().stream()
+                        .map(fileId -> storageService.getFileEntity(fileId))
+                        .peek(this::checkNotAssociated)
+                        .peek(file -> file.setMarker(newMarker))
+                        .collect(Collectors.toList());
+                newMarker.setFiles(fileList);
+            } else {
+                newMarker.setFiles(Collections.emptyList());
+            }
+
+            final Marker savedMarker = markerService.saveNewMarker(newMarker);
+            final MarkerDTO markerDTO = entityToDto(savedMarker);
+            final StatusDTO statusDTO = new StatusDTO(ReturnCode.OK, "ok");
+
+            return new NewMarkerResponse(statusDTO, markerDTO);
         }
-        else {
-            newMarker.setFiles(Collections.emptyList());
+        catch (Exception e) {
+            // TODO log exception
+            final StatusDTO status = new StatusDTO(ReturnCode.GENERAL_ERROR, e.getMessage());
+            return new NewMarkerResponse(status, null);
         }
-
-        final Marker savedMarker = markerService.saveNewMarker(newMarker);
-        return entityToDto(savedMarker);
     }
 
-    private void checkNotAssociated(final File file) {
+    private void checkNotAssociated(final File file) throws StorageException {
         notNull(file, "file must not be null");
 
         if (file.getMarker() != null) {
@@ -101,22 +114,38 @@ public class MarkerController {
     @CrossOrigin(origins = "*")
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        notNull(file, "file must not be null");
+        try {
+            notNull(file, "file must not be null");
 
-        final Long id = storageService.store(file);
+            final Long id = storageService.store(file);
 
-        return new UploadFileResponse(id, file.getName(), file.getContentType(), file.getSize());
+            final StatusDTO status = new StatusDTO(ReturnCode.OK, "ok");
+            final FileDTO fileData = new FileDTO(id, file.getName(), file.getContentType(), file.getSize());
+
+            return new UploadFileResponse(status, fileData);
+        }
+        catch (Exception e) {
+            // TODO log exception
+            final StatusDTO status = new StatusDTO(ReturnCode.GENERAL_ERROR, e.getMessage());
+            return new UploadFileResponse(status, null);
+        }
     }
 
     @GetMapping("/files/{id:[0-9]+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable Long id) {
-        notNull(id, "id must not be null");
+        try {
+            notNull(id, "id must not be null");
 
-        final FileData fileData = storageService.loadAsResource(id);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, fileData.getContentType())
-                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileData.getSize()))
-                .body(fileData.getResource());
+            final FileData fileData = storageService.loadAsResource(id);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, fileData.getContentType())
+                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileData.getSize()))
+                    .body(fileData.getResource());
+        }
+        catch (Exception e) {
+            // TODO log exception
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }

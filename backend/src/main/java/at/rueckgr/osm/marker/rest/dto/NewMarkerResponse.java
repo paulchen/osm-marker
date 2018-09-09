@@ -3,7 +3,7 @@ package at.rueckgr.osm.marker.rest.dto;
 import lombok.Data;
 
 @Data
-public class UploadFileResponse {
+public class NewMarkerResponse {
     private final StatusDTO status;
-    private final FileDTO fileData;
+    private final MarkerDTO marker;
 }
