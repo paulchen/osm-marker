@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {Feature, Map, View} from 'ol';
+import {Feature, Map, View, Overlay as MapOverlay} from 'ol';
 import {Tile, Vector} from 'ol/layer';
 import * as source from 'ol/source';
 import {OSM} from 'ol/source';
 import {Point} from 'ol/geom';
 import {fromLonLat, transform} from 'ol/proj';
-import {Fill, Style, Stroke, Circle as CircleStyle} from 'ol/style';
+import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import {Overlay} from '@angular/cdk/overlay';
 import {DetailsComponent} from './details.component';
 import {MatDialog} from '@angular/material';
@@ -19,6 +19,7 @@ import {MarkerService} from './marker.service';
 export class AppComponent implements OnInit {
   foo: AppComponent;
   vectorSource: Vector;
+  map: Map;
 
   constructor(
       private overlay: Overlay,
@@ -54,7 +55,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const map = new Map({
+    this.map = new Map({
       target: 'map',
       layers: [
         new Tile({
@@ -86,7 +87,7 @@ export class AppComponent implements OnInit {
         })
       })
     });
-    map.addLayer(vector_layer);
+    this.map.addLayer(vector_layer);
 
     // this.vectorSource.addFeature(feature);
 
@@ -95,19 +96,43 @@ export class AppComponent implements OnInit {
     //   source: vectorSource
     // }));
     //
-    map.on('singleclick', (evt) => {
-      const coordinates = evt.coordinate;
+    this.map.on('singleclick', evt => {
+      let featureFound = false;
+      this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+        // TODO open edit window
+        console.log(feature);
+        featureFound = true;
+      });
 
-      this.openOverlay(coordinates);
+      if (!featureFound) {
+        this.openOverlay(evt.coordinate);
+      }
     });
 
     this.markerService.getAllMarkers().subscribe(markerData => {
       markerData.markers.forEach(marker => {
         const feature = new Feature({
-          geometry: new Point(fromLonLat([marker.longitude, marker.latitude]))
+          geometry: new Point(fromLonLat([marker.longitude, marker.latitude])),
+          data: marker
         });
         this.vectorSource.addFeature(feature);
       });
+    });
+
+    const tooltip = new MapOverlay({
+      element: document.getElementById('info'),
+      positioning: 'bottom-left'
+    });
+    tooltip.setMap(this.map);
+
+    this.map.on('pointermove', evt => {
+      const feature = this.map.forEachFeatureAtPixel(evt.pixel, featureAtPixel => {
+        tooltip.setPosition(evt.coordinate);
+        tooltip.getElement().innerHTML = featureAtPixel.values_.data.name;
+        return featureAtPixel;
+      });
+      tooltip.getElement().style.display = feature ? '' : 'none';
+      document.body.style.cursor = feature ? 'pointer' : '';
     });
   }
 }
