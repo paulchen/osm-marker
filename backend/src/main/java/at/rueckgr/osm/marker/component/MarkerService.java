@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static org.springframework.util.Assert.notNull;
+
 @Component
 public class MarkerService {
     @Autowired
@@ -14,5 +16,11 @@ public class MarkerService {
 
     public List<Marker> getAllMarkers() {
         return markerRepository.findAll();
+    }
+
+    public Marker saveNewMarker(final Marker newMarker) {
+        notNull(newMarker, "newMarker must not be null");
+
+        return markerRepository.save(newMarker);
     }
 }

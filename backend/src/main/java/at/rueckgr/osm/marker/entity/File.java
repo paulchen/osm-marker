@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
@@ -27,4 +28,7 @@ public class File {
     @NotNull
     @Column(nullable = false)
     private String contentType;
+
+    @ManyToOne
+    private Marker marker;
 }

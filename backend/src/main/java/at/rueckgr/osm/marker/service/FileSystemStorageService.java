@@ -116,4 +116,15 @@ public class FileSystemStorageService {
             throw new StorageFileNotFoundException("Could not read file with id " + id, e);
         }
     }
+
+    public File getFileEntity(final Long fileId) {
+        notNull(fileId, "fileId must not be null");
+
+        final Optional<File> optional = fileRepository.findById(fileId);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+
+        throw new StorageFileNotFoundException("File not found with id " + fileId);
+    }
 }
