@@ -1,8 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MatDialogRef} from '@angular/material';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {UploadService} from './upload.service';
 import {forkJoin} from 'rxjs';
+import {MAT_DIALOG_DATA} from '@angular/material';
+import {Marker} from './marker';
+import {Upload} from './upload';
 
 @Component({
   selector: 'app-details',
@@ -25,24 +28,30 @@ export class DetailsComponent implements OnInit {
 
   formGroup: FormGroup;
 
+  existingUploads: Upload[];
+
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<DetailsComponent>,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    @Inject(MAT_DIALOG_DATA) public existingMarker: Marker
   ) {}
 
   ngOnInit() {
     this.formGroup = this.formBuilder.group({
       title: new FormControl()
     });
+
+    if (this.existingMarker != null) {
+      this.title = this.existingMarker.name;
+    }
+
+    this.uploadService.loadExistingUploads(this.existingMarker.id).subscribe(uploads => this.existingUploads = uploads);
   }
 
+  // TODO use this?
   submit(form) {
     this.dialogRef.close(`${form.value.title}`);
-  }
-
-  previewImage(event) {
-    // TODO
   }
 
   addFiles() {

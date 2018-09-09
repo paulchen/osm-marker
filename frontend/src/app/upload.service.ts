@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Subject, Observable } from 'rxjs';
+import {Upload} from './upload';
 
 const url = 'http://localhost:8080/osm/uploadFile';
+const uploadUrl = 'http://localhost:8080/osm/marker/{id}/uploads';
 
 @Injectable()
 export class UploadService {
@@ -61,5 +63,10 @@ export class UploadService {
 
     // return the map of progress.observables
     return status;
+  }
+
+  loadExistingUploads(markerId: number): Observable<Set<Upload>> {
+    const requestUrl = uploadUrl.replace('{id}', String(markerId));
+    return this.http.get<Set<Upload>>(requestUrl);
   }
 }

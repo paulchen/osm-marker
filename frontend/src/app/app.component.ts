@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
   }
 
   openOverlay(coordinates): void {
-    const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%' });
+    const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%', data: null });
 
     fileNameDialogRef
       .afterClosed()
@@ -52,6 +52,22 @@ export class AppComponent implements OnInit {
     // });
     // const overlayPortal = new ComponentPortal(DetailsComponent);
     // overlayRef.attach(overlayPortal);
+  }
+
+  editMarker(marker): void {
+    const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%', data: marker });
+
+    fileNameDialogRef
+      .afterClosed()
+      .subscribe(data => {
+        if (data === 'null' || !data) {
+          return;
+        }
+
+        console.log(data);
+        // TODO update marker
+
+      });
   }
 
   ngOnInit(): void {
@@ -97,15 +113,12 @@ export class AppComponent implements OnInit {
     // }));
     //
     this.map.on('singleclick', evt => {
-      let featureFound = false;
-      this.map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
-        // TODO open edit window
-        console.log(feature);
-        featureFound = true;
-      });
+      const feature = this.map.forEachFeatureAtPixel(evt.pixel, featureAtPixel => featureAtPixel);
 
-      if (!featureFound) {
+      if (!feature) {
         this.openOverlay(evt.coordinate);
+      } else {
+        this.editMarker(feature.values_.data);
       }
     });
 
