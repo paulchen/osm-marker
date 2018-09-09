@@ -1,7 +1,10 @@
 package at.rueckgr.osm.marker.service;
 
+import at.rueckgr.osm.marker.entity.File;
 import at.rueckgr.osm.marker.exception.StorageException;
 import at.rueckgr.osm.marker.exception.StorageFileNotFoundException;
+import at.rueckgr.osm.marker.repository.FileRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ import java.util.stream.Stream;
 @Service
 public class FileSystemStorageService {
 
+    @Autowired
+    private FileRepository fileRepository;
+
     private Path rootLocation;
 
     @PostConstruct
@@ -36,7 +42,7 @@ public class FileSystemStorageService {
         }
     }
 
-    public void store(MultipartFile file) {
+    public Long store(final MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         try {
             if (file.isEmpty()) {
@@ -48,14 +54,25 @@ public class FileSystemStorageService {
                         "Cannot store file with relative path outside current directory "
                                 + filename);
             }
+
+            File fileEntity = new File();
+            fileEntity.setActualFilename(filename);
+            fileEntity = fileRepository.save(fileEntity);
+
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, this.rootLocation.resolve(filename),
-                    StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(inputStream, getFilesystemPath(fileEntity));
             }
+
+            return fileEntity.getId();
         }
         catch (IOException e) {
             throw new StorageException("Failed to store file " + filename, e);
         }
+    }
+
+    private Path getFilesystemPath(final File fileEntity) {
+        final String filename = "file_" + String.format("%05d", fileEntity.getId());
+        return this.rootLocation.resolve(filename);
     }
 
     public Stream<Path> loadAll() {

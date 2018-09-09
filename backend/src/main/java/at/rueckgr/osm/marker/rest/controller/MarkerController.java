@@ -47,12 +47,12 @@ public class MarkerController {
     @CrossOrigin(origins = "*")
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        storageService.store(file);
+        final Long id = storageService.store(file);
 
 //        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
 //                .path("/downloadFile/")
 //                .path(file.getName())
 //                .toUriString();
 //
-        return new UploadFileResponse(file.getName(), file.getContentType(), file.getSize());
+        return new UploadFileResponse(id, file.getName(), file.getContentType(), file.getSize());
     }}
