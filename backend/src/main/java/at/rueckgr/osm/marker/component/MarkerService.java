@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -22,5 +23,11 @@ public class MarkerService {
         notNull(newMarker, "newMarker must not be null");
 
         return markerRepository.save(newMarker);
+    }
+
+    public Optional<Marker> findMarker(final Long markerId) {
+        notNull(markerId, "markerId must not be null");
+
+        return markerRepository.findById(markerId);
     }
 }

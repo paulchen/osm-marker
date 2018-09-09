@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.Assert.notNull;
@@ -121,6 +122,7 @@ public class MarkerController {
             final Long id = storageService.store(file);
 
             final StatusDTO status = new StatusDTO(ReturnCode.OK, "ok");
+            // TODO content type always application/octet-stream?
             final FileDTO fileData = new FileDTO(id, file.getName(), file.getContentType(), file.getSize());
 
             return new UploadFileResponse(status, fileData);
@@ -148,5 +150,28 @@ public class MarkerController {
             // TODO log exception
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/marker/{markerId:[0-9]+}/uploads")
+    public List<FileDTO> loadExistingUploads(@PathVariable final Long markerId) {
+        notNull(markerId, "markerId must not be null");
+
+        final Optional<Marker> optional = markerService.findMarker(markerId);
+        if (!optional.isPresent()) {
+            // TODO scream
+            throw new IllegalArgumentException();
+        }
+
+        return optional.get()
+                .getFiles()
+                .stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    private FileDTO entityToDto(final File file) {
+        // TODO file size
+        return new FileDTO(file.getId(), file.getActualFilename(), file.getContentType(), 1L);
     }
 }
