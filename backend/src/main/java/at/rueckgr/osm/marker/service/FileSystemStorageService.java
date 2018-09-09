@@ -1,6 +1,7 @@
 package at.rueckgr.osm.marker.service;
 
 import at.rueckgr.osm.marker.entity.File;
+import at.rueckgr.osm.marker.exception.ConfigurationKeyNotFoundException;
 import at.rueckgr.osm.marker.exception.StorageException;
 import at.rueckgr.osm.marker.exception.StorageFileNotFoundException;
 import at.rueckgr.osm.marker.repository.FileRepository;
@@ -27,17 +28,25 @@ public class FileSystemStorageService {
     @Autowired
     private FileRepository fileRepository;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     private Path rootLocation;
 
     @PostConstruct
     public void init() {
-        rootLocation = Paths.get("/tmp/upload-dir");
+        if (rootLocation == null) {
+            try {
+                rootLocation = Paths.get(configurationService.getStringConfiguration(ConfigurationKey.UPLOAD_DIRECTORY));
+            } catch (ConfigurationKeyNotFoundException e) {
+                throw new StorageException("Upload directory not configured", e);
+            }
 
-        try {
-            Files.createDirectories(rootLocation);
-        }
-        catch (IOException e) {
-            throw new StorageException("Could not initialize storage", e);
+            try {
+                Files.createDirectories(rootLocation);
+            } catch (IOException e) {
+                throw new StorageException("Could not initialize storage", e);
+            }
         }
     }
 
