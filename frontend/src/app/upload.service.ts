@@ -74,4 +74,9 @@ export class UploadService {
     const requestUrl = uploadUrl.replace('{id}', String(markerId));
     return this.http.get<Upload[]>(requestUrl);
   }
+
+  removeUpload(file: number): Observable<any> {
+    const requestUrl = downloadUrl.replace('{id}', String(file));
+    return this.http.delete<any>(requestUrl);
+  }
 }

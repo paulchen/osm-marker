@@ -46,7 +46,9 @@ export class DetailsComponent implements OnInit {
       this.title = this.existingMarker.name;
     }
 
-    this.uploadService.loadExistingUploads(this.existingMarker.id).subscribe(uploads => this.existingUploads = uploads);
+    if (this.existingMarker != null) {
+      this.uploadService.loadExistingUploads(this.existingMarker.id).subscribe(uploads => this.existingUploads = uploads);
+    }
   }
 
   // TODO use this?
@@ -131,6 +133,6 @@ export class DetailsComponent implements OnInit {
   }
 
   deleteMarker() {
-    return this.dialogRef.close({action: 'DELETE'});
+    return this.dialogRef.close({action: 'DELETE', files: this.serverFileData});
   }
 }

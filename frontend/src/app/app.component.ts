@@ -10,6 +10,8 @@ import {Overlay} from '@angular/cdk/overlay';
 import {DetailsComponent} from './details.component';
 import {MatDialog} from '@angular/material';
 import {MarkerService} from './marker.service';
+import {forkJoin} from 'rxjs';
+import {UploadService} from './upload.service';
 
 @Component({
   selector: 'app-root',
@@ -24,13 +26,15 @@ export class AppComponent implements OnInit {
   constructor(
       private overlay: Overlay,
       private dialog: MatDialog,
-      private markerService: MarkerService) {
+      private markerService: MarkerService,
+      private uploadService: UploadService) {
     this.foo = this;
   }
 
   openOverlay(coordinates): void {
     const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%', data: null });
 
+    // TODO delete files which have already been uploaded when cancelling the overlay
     fileNameDialogRef
       .afterClosed()
       .subscribe(data => {
@@ -40,8 +44,8 @@ export class AppComponent implements OnInit {
 
         console.log(data);
         const transformedCoordinates = transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-        this.markerService.createMarker(data.title, data.files, transformedCoordinates[1], transformedCoordinates[0]).subscribe(() => {
-          const newFeature = new Feature({geometry: new Point(coordinates)});
+        this.markerService.createMarker(data.title, data.files, transformedCoordinates[1], transformedCoordinates[0]).subscribe(result => {
+          const newFeature = new Feature({geometry: new Point(coordinates), data: result.marker});
           this.vectorSource.addFeature(newFeature);
         });
 
@@ -65,7 +69,13 @@ export class AppComponent implements OnInit {
         }
 
         if (data.action === 'DELETE') {
-          this.markerService.deleteMarker(marker.id).subscribe(() => {
+          const observables = [];
+          observables.push(this.markerService.deleteMarker(marker.id));
+
+          // files that have been uploaded in this dialog
+          data.files.forEach(file => observables.push(this.uploadService.removeUpload(file)));
+
+          forkJoin(observables).subscribe(() => {
             this.vectorSource.removeFeature(feature);
           });
           return;
