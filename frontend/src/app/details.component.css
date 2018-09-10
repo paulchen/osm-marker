@@ -16,3 +16,8 @@
 .container {
   height: 100%;
 }
+
+.remove-upload {
+  font-size: 80%;
+  padding-left: 2em;
+}

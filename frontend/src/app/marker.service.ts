@@ -28,4 +28,14 @@ export class MarkerService {
     };
     return this.http.post<MarkerData>(url, data, httpOptions);
   }
+
+  updateMarker(id: number, name: string, files: number[]) {
+    // TODO
+    const data = {
+      name: name,
+      fileIds: files
+    };
+    const postUrl = url + '/' + id;
+    return this.http.post<MarkerData>(postUrl, data, httpOptions);
+  }
 }

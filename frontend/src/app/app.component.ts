@@ -65,8 +65,14 @@ export class AppComponent implements OnInit {
         }
 
         console.log(data);
-        // TODO update marker
 
+        const files = [];
+        data.existingUploads.forEach(upload => files.push(upload.id));
+        data.files.forEach(upload => files.push(upload));
+
+        this.markerService.updateMarker(marker.id, data.title, files).subscribe(() => {
+          marker.name = data.title;
+        });
       });
   }
 

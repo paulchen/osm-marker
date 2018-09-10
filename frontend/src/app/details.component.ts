@@ -71,7 +71,7 @@ export class DetailsComponent implements OnInit {
     console.log('1');
     // if everything was uploaded already, just close the dialog
     if (this.uploadSuccessful) {
-      return this.dialogRef.close({title: this.title, files: this.serverFileData});
+      return this.dialogRef.close({title: this.title, files: this.serverFileData, existingUploads: this.existingUploads});
     }
 
     // set the component state to "uploading"
@@ -124,5 +124,9 @@ export class DetailsComponent implements OnInit {
 
   getDownloadLink(upload: Upload) {
     return UploadService.getDownloadLink(upload);
+  }
+
+  removeUpload(id: number) {
+    this.existingUploads = this.existingUploads.filter(upload => upload.id !== id);
   }
 }
