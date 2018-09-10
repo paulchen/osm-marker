@@ -4,4 +4,5 @@ export class Marker {
   longitude: number;
   name: string;
   link: string;
+  uploads: number;
 }

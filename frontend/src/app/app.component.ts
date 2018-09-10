@@ -20,7 +20,7 @@ import {UploadService} from './upload.service';
 })
 export class AppComponent implements OnInit {
   foo: AppComponent;
-  vectorSource: Vector;
+  vectorSources: Vector[];
   map: Map;
 
   constructor(
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
         this.markerService.createMarker(data.title, data.link, data.files, transformedCoordinates[1], transformedCoordinates[0])
               .subscribe(result => {
           const newFeature = new Feature({geometry: new Point(coordinates), data: result.marker});
-          this.vectorSource.addFeature(newFeature);
+          this.vectorSources[data.files.size > 0 ? 1 : 0].addFeature(newFeature);
         });
 
       });
@@ -88,7 +88,7 @@ export class AppComponent implements OnInit {
           data.files.forEach(file => observables.push(this.uploadService.removeUpload(file)));
 
           forkJoin(observables).subscribe(() => {
-            this.vectorSource.removeFeature(feature);
+            this.vectorSources[marker.uploads > 0 ? 1 : 0].removeFeature(feature);
           });
           return;
         }
@@ -102,6 +102,10 @@ export class AppComponent implements OnInit {
         this.markerService.updateMarker(marker.id, data.title, data.link, files).subscribe(() => {
           marker.name = data.title;
           marker.link = data.link;
+
+          this.vectorSources[marker.uploads > 0 ? 1 : 0].removeFeature(feature);
+          marker.uploads = files.length;
+          this.vectorSources[marker.uploads > 0 ? 1 : 0].addFeature(feature);
         });
       });
   }
@@ -127,9 +131,9 @@ export class AppComponent implements OnInit {
     // const feature = new Feature({
     //   geometry: new Point(fromLonLat([16.37, 48.21]))
     // });
-    this.vectorSource = new source.Vector();
-    const vector_layer = new Vector({
-      source: this.vectorSource,
+    this.vectorSources = [new source.Vector(), new source.Vector()];
+    const vector_layer0 = new Vector({
+      source: this.vectorSources[0],
       style: new Style({
         image: new CircleStyle({
           radius: 4,
@@ -139,7 +143,19 @@ export class AppComponent implements OnInit {
         })
       })
     });
-    this.map.addLayer(vector_layer);
+    this.map.addLayer(vector_layer0);
+    const vector_layer1 = new Vector({
+      source: this.vectorSources[1],
+      style: new Style({
+        image: new CircleStyle({
+          radius: 4,
+          fill: new Fill({
+            color: '#0000ff'
+          })
+        })
+      })
+    });
+    this.map.addLayer(vector_layer1);
 
     // this.vectorSource.addFeature(feature);
 
@@ -164,7 +180,7 @@ export class AppComponent implements OnInit {
           geometry: new Point(fromLonLat([marker.longitude, marker.latitude])),
           data: marker
         });
-        this.vectorSource.addFeature(feature);
+        this.vectorSources[marker.uploads > 0 ? 1 : 0].addFeature(feature);
       });
     });
 
