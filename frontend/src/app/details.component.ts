@@ -20,7 +20,6 @@ export class DetailsComponent implements OnInit {
   progress;
   canBeClosed = true;
   primaryButtonText = 'Upload';
-  showCancelButton = true;
   uploading = false;
   uploadSuccessful = false;
 
@@ -98,9 +97,6 @@ export class DetailsComponent implements OnInit {
     // The dialog should not be closed while uploading
     this.canBeClosed = false;
     this.dialogRef.disableClose = true;
-
-    // Hide the cancel-button
-    this.showCancelButton = false;
 
     // When all progress-observables are completed...
     forkJoin(allProgressObservables).subscribe(end => {

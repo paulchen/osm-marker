@@ -34,11 +34,16 @@ export class AppComponent implements OnInit {
   openOverlay(coordinates): void {
     const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%', data: null });
 
-    // TODO delete files which have already been uploaded when cancelling the overlay
     fileNameDialogRef
       .afterClosed()
       .subscribe(data => {
-        if (data === 'null' || !data) {
+        if (!data || data.action == null) {
+          const observables = [];
+
+          // files that have been uploaded in this dialog
+          fileNameDialogRef.componentInstance.serverFileData.forEach(file => observables.push(this.uploadService.removeUpload(file)));
+
+          forkJoin(observables).subscribe(() => {});
           return;
         }
 
@@ -64,7 +69,13 @@ export class AppComponent implements OnInit {
     fileNameDialogRef
       .afterClosed()
       .subscribe(data => {
-        if (data === 'null' || !data) {
+        if (!data || data.action == null) {
+          const observables = [];
+
+          // files that have been uploaded in this dialog
+          fileNameDialogRef.componentInstance.serverFileData.forEach(file => observables.push(this.uploadService.removeUpload(file)));
+
+          forkJoin(observables).subscribe(() => {});
           return;
         }
 
