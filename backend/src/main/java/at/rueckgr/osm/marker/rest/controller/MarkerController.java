@@ -249,4 +249,15 @@ public class MarkerController {
         marker.getFiles().forEach(file -> storageService.removeUpload(file));
         markerService.deleteMarker(marker);
     }
+
+    @CrossOrigin(origins = "*")
+    @DeleteMapping("/files/{fileId:[0-9]+}")
+    @Transactional
+    public void deleteFile(@PathVariable final Long fileId) {
+        // TODO error handling
+        notNull(fileId, "fileId must not be null");
+
+        final File fileEntity = storageService.getFileEntity(fileId);
+        storageService.removeUpload(fileEntity);
+    }
 }
