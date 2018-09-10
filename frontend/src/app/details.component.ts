@@ -24,6 +24,7 @@ export class DetailsComponent implements OnInit {
   uploadSuccessful = false;
 
   title = '';
+  link = '';
 
   formGroup: FormGroup;
 
@@ -43,6 +44,7 @@ export class DetailsComponent implements OnInit {
 
     if (this.existingMarker != null) {
       this.title = this.existingMarker.name;
+      this.link = this.existingMarker.link;
     }
 
     if (this.existingMarker != null) {
@@ -72,7 +74,13 @@ export class DetailsComponent implements OnInit {
     console.log('1');
     // if everything was uploaded already, just close the dialog
     if (this.uploadSuccessful) {
-      return this.dialogRef.close({action: 'SAVE', title: this.title, files: this.serverFileData, existingUploads: this.existingUploads});
+      return this.dialogRef.close({
+        action: 'SAVE',
+        title: this.title,
+        link: this.link,
+        files: this.serverFileData,
+        existingUploads: this.existingUploads
+      });
     }
 
     // set the component state to "uploading"

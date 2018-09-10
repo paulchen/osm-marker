@@ -49,7 +49,8 @@ export class AppComponent implements OnInit {
 
         console.log(data);
         const transformedCoordinates = transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-        this.markerService.createMarker(data.title, data.files, transformedCoordinates[1], transformedCoordinates[0]).subscribe(result => {
+        this.markerService.createMarker(data.title, data.link, data.files, transformedCoordinates[1], transformedCoordinates[0])
+              .subscribe(result => {
           const newFeature = new Feature({geometry: new Point(coordinates), data: result.marker});
           this.vectorSource.addFeature(newFeature);
         });
@@ -98,8 +99,9 @@ export class AppComponent implements OnInit {
         data.existingUploads.forEach(upload => files.push(upload.id));
         data.files.forEach(upload => files.push(upload));
 
-        this.markerService.updateMarker(marker.id, data.title, files).subscribe(() => {
+        this.markerService.updateMarker(marker.id, data.title, data.link, files).subscribe(() => {
           marker.name = data.title;
+          marker.link = data.link;
         });
       });
   }

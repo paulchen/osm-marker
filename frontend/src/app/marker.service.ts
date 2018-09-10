@@ -18,21 +18,23 @@ export class MarkerService {
     return this.http.get<MarkerData>(url, httpOptions);
   }
 
-  createMarker(name: string, files: Set<any>, latitude: number, longitude: number): Observable<any> {
+  createMarker(name: string, link: string, files: Set<any>, latitude: number, longitude: number): Observable<any> {
     // TODO
     const data = {
       latitude: latitude,
       longitude: longitude,
       name: name,
+      link: link,
       fileIds: Array.from(files)
     };
     return this.http.post<MarkerData>(url, data, httpOptions);
   }
 
-  updateMarker(id: number, name: string, files: number[]) {
+  updateMarker(id: number, name: string, link: string, files: number[]) {
     // TODO
     const data = {
       name: name,
+      link: link,
       fileIds: files
     };
     const postUrl = url + '/' + id;
