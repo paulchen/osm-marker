@@ -30,4 +30,10 @@ public class MarkerService {
 
         return markerRepository.findById(markerId);
     }
+
+    public void deleteMarker(final Marker marker) {
+        notNull(marker, "marker must not be null");
+
+        markerRepository.delete(marker);
+    }
 }

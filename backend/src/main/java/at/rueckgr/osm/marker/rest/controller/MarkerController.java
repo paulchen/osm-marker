@@ -24,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -229,5 +230,23 @@ public class MarkerController {
             final StatusDTO status = new StatusDTO(ReturnCode.GENERAL_ERROR, e.getMessage());
             return new NewMarkerResponse(status, null);
         }
+    }
+
+    @CrossOrigin(origins = "*")
+    @DeleteMapping("/marker/{markerId:[0-9]+}")
+    @Transactional
+    public void updateMarker(@PathVariable final Long markerId) {
+        // TODO error handling
+        notNull(markerId, "markerId must not be null");
+
+        final Optional<Marker> optional = markerService.findMarker(markerId);
+        if (!optional.isPresent()) {
+            // TODO scream
+            return;
+        }
+
+        final Marker marker = optional.get();
+        marker.getFiles().forEach(file -> storageService.removeUpload(file));
+        markerService.deleteMarker(marker);
     }
 }
