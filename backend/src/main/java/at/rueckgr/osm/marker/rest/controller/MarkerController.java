@@ -11,6 +11,7 @@ import at.rueckgr.osm.marker.rest.dto.NewMarkerInput;
 import at.rueckgr.osm.marker.rest.dto.NewMarkerResponse;
 import at.rueckgr.osm.marker.rest.dto.ReturnCode;
 import at.rueckgr.osm.marker.rest.dto.StatusDTO;
+import at.rueckgr.osm.marker.rest.dto.UpdateMarkerInput;
 import at.rueckgr.osm.marker.rest.dto.UploadFileResponse;
 import at.rueckgr.osm.marker.service.FileData;
 import at.rueckgr.osm.marker.service.FileSystemStorageService;
@@ -32,9 +33,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.Assert.notNull;
@@ -173,5 +177,53 @@ public class MarkerController {
     private FileDTO entityToDto(final File file) {
         // TODO file size
         return new FileDTO(file.getId(), file.getActualFilename(), file.getContentType(), 1L);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/marker/{markerId:[0-9]+}")
+    @Transactional
+    public NewMarkerResponse updateMarker(@PathVariable final Long markerId, @RequestBody final UpdateMarkerInput newMarkerInput) {
+        try {
+            notNull(markerId, "markerId must not be null");
+
+            final Optional<Marker> optional = markerService.findMarker(markerId);
+            if (!optional.isPresent()) {
+                // TODO scream
+                throw new IllegalArgumentException();
+            }
+            final Marker marker = optional.get();
+
+            marker.setName(newMarkerInput.getName());
+
+            // TODO Java-8-style way?
+            final Iterator<File> iterator = marker.getFiles().iterator();
+            while (iterator.hasNext()) {
+                final File file = iterator.next();
+                if (!newMarkerInput.getFileIds().contains(file.getId())) {
+                    iterator.remove();
+                    storageService.removeUpload(file);
+                }
+            }
+
+            marker.getFiles().removeIf(file -> !newMarkerInput.getFileIds().contains(file.getId()));
+
+            final Set<Long> existingFileIds = marker.getFiles().stream().map(File::getId).collect(Collectors.toSet());
+            newMarkerInput.getFileIds()
+                    .stream()
+                    .filter(fileId -> !existingFileIds.contains(fileId))
+                    .map(fileId -> storageService.getFileEntity(fileId))
+                    .peek(this::checkNotAssociated)
+                    .peek(file -> file.setMarker(marker))
+                    .forEach(file -> marker.getFiles().add(file));
+
+            final MarkerDTO markerDTO = entityToDto(marker);
+            final StatusDTO statusDTO = new StatusDTO(ReturnCode.OK, "ok");
+            return new NewMarkerResponse(statusDTO, markerDTO);
+        }
+        catch (Exception e) {
+            // TODO log exception
+            final StatusDTO status = new StatusDTO(ReturnCode.GENERAL_ERROR, e.getMessage());
+            return new NewMarkerResponse(status, null);
+        }
     }
 }

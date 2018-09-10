@@ -127,4 +127,19 @@ public class FileSystemStorageService {
 
         throw new StorageFileNotFoundException("File not found with id " + fileId);
     }
+
+    public void removeUpload(final File file) {
+        notNull(file, "file must not be null");
+
+        fileRepository.delete(file);
+
+        final Path path = getFilesystemPath(file);
+        try {
+            Files.delete(path);
+        }
+        catch (IOException e) {
+            // TODO handle appropriately
+            throw new RuntimeException(e);
+        }
+    }
 }
