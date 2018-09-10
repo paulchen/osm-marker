@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name = "marker")
@@ -37,4 +38,8 @@ public class Marker {
 
     @OneToMany(mappedBy = "marker", cascade = { CascadeType.ALL })
     private List<File> files;
+
+    @NotNull
+    @Column(name = "last_updated", nullable = false)
+    private LocalDateTime lastUpdated;
 }

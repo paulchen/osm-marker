@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +84,7 @@ public class MarkerController {
             newMarker.setLatitude(newMarkerInput.getLatitude());
             newMarker.setLongitude(newMarkerInput.getLongitude());
             newMarker.setName(newMarkerInput.getName());
+            newMarker.setLastUpdated(LocalDateTime.now());
 
             if (newMarkerInput.getFileIds() != null) {
                 final List<File> fileList = newMarkerInput.getFileIds().stream()
@@ -194,6 +196,8 @@ public class MarkerController {
             final Marker marker = optional.get();
 
             marker.setName(newMarkerInput.getName());
+            // TODO only if really something changed
+            marker.setLastUpdated(LocalDateTime.now());
 
             // TODO Java-8-style way?
             final Iterator<File> iterator = marker.getFiles().iterator();

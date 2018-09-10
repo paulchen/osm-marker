@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity(name = "file")
 @Data
@@ -31,4 +32,8 @@ public class File {
 
     @ManyToOne
     private Marker marker;
+
+    @NotNull
+    @Column(name = "last_updated", nullable = false)
+    private LocalDateTime lastUpdated;
 }

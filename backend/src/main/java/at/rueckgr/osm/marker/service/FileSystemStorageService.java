@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.springframework.util.Assert.notNull;
@@ -70,6 +71,7 @@ public class FileSystemStorageService {
             File fileEntity = new File();
             fileEntity.setActualFilename(filename);
             fileEntity.setContentType(file.getContentType());
+            fileEntity.setLastUpdated(LocalDateTime.now());
             fileEntity = fileRepository.save(fileEntity);
 
             try (InputStream inputStream = file.getInputStream()) {

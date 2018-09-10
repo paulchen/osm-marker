@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity(name = "configuration")
 @Data
@@ -21,4 +22,8 @@ public class Configuration {
     @NotNull
     @Column(nullable = false)
     private String value;
+
+    @NotNull
+    @Column(name = "last_updated", nullable = false)
+    private LocalDateTime lastUpdated;
 }
