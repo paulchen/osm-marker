@@ -71,7 +71,10 @@ public class MarkerController {
         final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
         final MapperFacade mapper = mapperFactory.getMapperFacade();
 
-        return mapper.map(marker, MarkerDTO.class);
+        final MarkerDTO markerDTO = mapper.map(marker, MarkerDTO.class);
+        // TODO n+1 problem?
+        markerDTO.setUploads(marker.getFiles().size());
+        return markerDTO;
     }
 
     @CrossOrigin(origins = "*")

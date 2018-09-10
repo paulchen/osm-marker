@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class MarkerDTO {
-    private final Long id;
-    private final float latitude;
-    private final float longitude;
-    private final String name;
-    private final String link;
+    private Long id;
+    private float latitude;
+    private float longitude;
+    private String name;
+    private String link;
+    private int uploads;
 }
