@@ -121,4 +121,8 @@ export class DetailsComponent implements OnInit {
     // ... and the component is no longer uploading
     this.uploading = false;
   }
+
+  getDownloadLink(upload: Upload) {
+    return UploadService.getDownloadLink(upload);
+  }
 }

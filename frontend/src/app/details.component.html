@@ -61,7 +61,7 @@
     <div *ngIf="existingUploads != null && existingUploads.length > 0">
       <p>Existing files</p>
       <div *ngFor="let upload of existingUploads">
-        {{upload.fileName}}
+        <a href="{{getDownloadLink(upload)}}">{{upload.fileName}}</a>
       </div>
     </div>
 

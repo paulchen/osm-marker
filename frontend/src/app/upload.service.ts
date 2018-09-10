@@ -4,11 +4,16 @@ import { Subject, Observable } from 'rxjs';
 import {Upload} from './upload';
 
 const url = 'http://localhost:8080/osm/uploadFile';
+const downloadUrl = 'http://localhost:8080/osm/files/{id}';
 const uploadUrl = 'http://localhost:8080/osm/marker/{id}/uploads';
 
 @Injectable()
 export class UploadService {
   constructor(private http: HttpClient) {}
+
+  static getDownloadLink(upload: Upload): string {
+    return downloadUrl.replace('{id}', String(upload.id));
+  }
 
   public upload(files: Set<File>): {[key: string]: Observable<number>} {
     // this will be the our resulting map
@@ -65,8 +70,8 @@ export class UploadService {
     return status;
   }
 
-  loadExistingUploads(markerId: number): Observable<Set<Upload>> {
+  loadExistingUploads(markerId: number): Observable<Upload[]> {
     const requestUrl = uploadUrl.replace('{id}', String(markerId));
-    return this.http.get<Set<Upload>>(requestUrl);
+    return this.http.get<Upload[]>(requestUrl);
   }
 }
