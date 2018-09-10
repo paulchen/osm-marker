@@ -9,5 +9,6 @@ public class NewMarkerInput {
     private final float latitude;
     private final float longitude;
     private final String name;
+    private final String link;
     private final List<Long> fileIds;
 }

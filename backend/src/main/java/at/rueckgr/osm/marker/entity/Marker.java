@@ -33,8 +33,10 @@ public class Marker {
     private float longitude;
 
     @NotNull
-    @Column
+    @Column(nullable = false)
     private String name;
+
+    private String link;
 
     @OneToMany(mappedBy = "marker", cascade = { CascadeType.ALL })
     private List<File> files;

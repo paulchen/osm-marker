@@ -8,4 +8,5 @@ public class MarkerDTO {
     private final float latitude;
     private final float longitude;
     private final String name;
+    private final String link;
 }

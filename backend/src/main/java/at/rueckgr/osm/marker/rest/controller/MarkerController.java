@@ -85,6 +85,7 @@ public class MarkerController {
             newMarker.setLatitude(newMarkerInput.getLatitude());
             newMarker.setLongitude(newMarkerInput.getLongitude());
             newMarker.setName(newMarkerInput.getName());
+            newMarker.setLink(newMarkerInput.getLink());
             newMarker.setLastUpdated(LocalDateTime.now());
 
             if (newMarkerInput.getFileIds() != null) {
@@ -185,7 +186,7 @@ public class MarkerController {
     @CrossOrigin(origins = "*")
     @PostMapping("/marker/{markerId:[0-9]+}")
     @Transactional
-    public NewMarkerResponse updateMarker(@PathVariable final Long markerId, @RequestBody final UpdateMarkerInput newMarkerInput) {
+    public NewMarkerResponse updateMarker(@PathVariable final Long markerId, @RequestBody final UpdateMarkerInput updateMarkerInput) {
         try {
             notNull(markerId, "markerId must not be null");
 
@@ -196,7 +197,8 @@ public class MarkerController {
             }
             final Marker marker = optional.get();
 
-            marker.setName(newMarkerInput.getName());
+            marker.setName(updateMarkerInput.getName());
+            marker.setLink(updateMarkerInput.getLink());
             // TODO only if really something changed
             marker.setLastUpdated(LocalDateTime.now());
 
@@ -204,16 +206,16 @@ public class MarkerController {
             final Iterator<File> iterator = marker.getFiles().iterator();
             while (iterator.hasNext()) {
                 final File file = iterator.next();
-                if (!newMarkerInput.getFileIds().contains(file.getId())) {
+                if (!updateMarkerInput.getFileIds().contains(file.getId())) {
                     iterator.remove();
                     storageService.removeUpload(file);
                 }
             }
 
-            marker.getFiles().removeIf(file -> !newMarkerInput.getFileIds().contains(file.getId()));
+            marker.getFiles().removeIf(file -> !updateMarkerInput.getFileIds().contains(file.getId()));
 
             final Set<Long> existingFileIds = marker.getFiles().stream().map(File::getId).collect(Collectors.toSet());
-            newMarkerInput.getFileIds()
+            updateMarkerInput.getFileIds()
                     .stream()
                     .filter(fileId -> !existingFileIds.contains(fileId))
                     .map(fileId -> storageService.getFileEntity(fileId))
