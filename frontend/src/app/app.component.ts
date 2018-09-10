@@ -54,13 +54,20 @@ export class AppComponent implements OnInit {
     // overlayRef.attach(overlayPortal);
   }
 
-  editMarker(marker): void {
+  editMarker(feature, marker): void {
     const fileNameDialogRef = this.dialog.open(DetailsComponent, { width: '50%', data: marker });
 
     fileNameDialogRef
       .afterClosed()
       .subscribe(data => {
         if (data === 'null' || !data) {
+          return;
+        }
+
+        if (data.action === 'DELETE') {
+          this.markerService.deleteMarker(marker.id).subscribe(() => {
+            this.vectorSource.removeFeature(feature);
+          });
           return;
         }
 
@@ -124,7 +131,7 @@ export class AppComponent implements OnInit {
       if (!feature) {
         this.openOverlay(evt.coordinate);
       } else {
-        this.editMarker(feature.values_.data);
+        this.editMarker(feature, feature.values_.data);
       }
     });
 

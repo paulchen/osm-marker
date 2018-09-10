@@ -38,4 +38,9 @@ export class MarkerService {
     const postUrl = url + '/' + id;
     return this.http.post<MarkerData>(postUrl, data, httpOptions);
   }
+
+  deleteMarker(id: number) {
+    const deleteUrl = url + '/' + id;
+    return this.http.delete<any>(deleteUrl, httpOptions);
+  }
 }
