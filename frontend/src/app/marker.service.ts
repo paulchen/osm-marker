@@ -2,8 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {MarkerData} from './marker-data';
+import {environment} from '../environments/environment';
 
-const url = 'http://localhost:8080/osm/marker';
+const url = 'marker';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -15,7 +16,7 @@ export class MarkerService {
   }
 
   public getAllMarkers(): Observable<MarkerData> {
-    return this.http.get<MarkerData>(url, httpOptions);
+    return this.http.get<MarkerData>(environment.backendUrl + url, httpOptions);
   }
 
   createMarker(name: string, link: string, files: Set<any>, latitude: number, longitude: number): Observable<any> {
@@ -27,7 +28,7 @@ export class MarkerService {
       link: link,
       fileIds: Array.from(files)
     };
-    return this.http.post<MarkerData>(url, data, httpOptions);
+    return this.http.post<MarkerData>(environment.backendUrl + url, data, httpOptions);
   }
 
   updateMarker(id: number, name: string, link: string, files: number[]) {
@@ -37,12 +38,12 @@ export class MarkerService {
       link: link,
       fileIds: files
     };
-    const postUrl = url + '/' + id;
+    const postUrl = environment.backendUrl + url + '/' + id;
     return this.http.post<MarkerData>(postUrl, data, httpOptions);
   }
 
   deleteMarker(id: number) {
-    const deleteUrl = url + '/' + id;
+    const deleteUrl = environment.backendUrl + url + '/' + id;
     return this.http.delete<any>(deleteUrl, httpOptions);
   }
 }
