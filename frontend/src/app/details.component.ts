@@ -26,6 +26,8 @@ export class DetailsComponent implements OnInit {
   title = '';
   link = '';
 
+  error = '';
+
   formGroup: FormGroup;
 
   existingUploads: Upload[];
@@ -87,7 +89,8 @@ export class DetailsComponent implements OnInit {
     this.uploading = true;
 
     // start the upload and save the progress map
-    this.progress = this.uploadService.upload(this.files);
+    const uploadData = this.uploadService.upload(this.files)
+    this.progress = uploadData.files;
 
     // convert the progress map into an array
     const allProgressObservables = [];
@@ -96,6 +99,8 @@ export class DetailsComponent implements OnInit {
 
       this.progress[key].filename.subscribe(file => this.serverFileData.add(file));
     }
+
+    uploadData.errors.subscribe(s => this.error = s);
 
     // Adjust the state variables
 

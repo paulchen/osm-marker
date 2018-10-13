@@ -73,6 +73,10 @@
       </div>
     </div>
 
+    <div *ngIf="error != ''" class="error-message">
+      {{error}}
+    </div>
+
     <!-- This are the actions of the dialog, containing the primary and the cancel button-->
     <mat-dialog-actions class="actions">
       <button *ngIf="existingUploads != null" mat-button (click)="deleteMarker()">Delete</button>

@@ -21,3 +21,8 @@
   font-size: 80%;
   padding-left: 2em;
 }
+
+.error-message {
+  font-weight: bold;
+  color: red;
+}

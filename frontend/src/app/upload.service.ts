@@ -16,7 +16,9 @@ export class UploadService {
     return environment.backendUrl + downloadUrl.replace('{id}', String(upload.id));
   }
 
-  public upload(files: Set<File>): {[key: string]: Observable<number>} {
+  public upload(files: Set<File>): any {
+    const errors = new Subject<string>();
+
     // this will be the our resulting map
     const status = {};
 
@@ -33,7 +35,6 @@ export class UploadService {
 
       // create a new progress-subject for every file
       const progress = new Subject<number>();
-
       const filename = new Subject<string>();
 
       // send the http-request and subscribe for progress-updates
@@ -57,18 +58,19 @@ export class UploadService {
           // The upload is complete
           progress.complete();
         }
+      }, errorEvent => {
+        errors.next(errorEvent.error.status.message);
       });
 
       // Save every progress-observable in a map of all observables
       status[file.name] = {
-        progress: progress.asObservable()
-        ,
+        progress: progress.asObservable(),
         filename: filename.asObservable()
       };
     });
 
     // return the map of progress.observables
-    return status;
+    return {files: status, errors: errors};
   }
 
   loadExistingUploads(markerId: number): Observable<Upload[]> {
