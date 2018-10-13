@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestControllerAdvice
 public class RestExceptionHandler {
     @RequestMapping(produces = "application/json")
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(value = HttpStatus.PAYLOAD_TOO_LARGE)
-    public ErrorResponse handleMaxUploadSizeExceededException(final MaxUploadSizeExceededException ex) {
+    public ErrorResponse handleMaxUploadSizeExceededException(final MaxUploadSizeExceededException ex, final HttpServletResponse httpServletResponse) {
+        httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
         return new ErrorResponse(new StatusDTO(ReturnCode.FILE_TOO_LARGE, String.format("Maximum upload file size of %s bytes exceeded", ex.getMaxUploadSize())));
     }
 }
