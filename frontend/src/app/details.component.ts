@@ -13,7 +13,7 @@ import {Upload} from './upload';
   styleUrls: ['./details.component.css']
 })
 export class DetailsComponent implements OnInit {
-  @ViewChild('file') file;
+  @ViewChild('file', { static: false }) file;
   public files: Set<File> = new Set();
   public serverFileData: Set<number> = new Set();
 
