@@ -29,7 +29,8 @@
     "zone.js": "~0.9.1",
     "minimist": "^1.2.5",
     "lodash": "^4.17.19",
-    "elliptic": "^6.5.3"
+    "elliptic": "^6.5.3",
+    "serialize-javascript": "^4.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.26",
