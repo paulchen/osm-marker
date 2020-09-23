@@ -30,7 +30,8 @@
     "minimist": "^1.2.5",
     "lodash": "^4.17.19",
     "elliptic": "^6.5.3",
-    "serialize-javascript": "^4.0.0"
+    "serialize-javascript": "^4.0.0",
+    "node-forge": "^0.10.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.26",
@@ -54,6 +55,7 @@
     "tslint": "~5.20.1",
     "typescript": "~3.5.3",
     "minimist": "^1.2.5",
-    "npm-registry-fetch": "^8.1.1"
+    "npm-registry-fetch": "^8.1.1",
+    "yargs-parser": "^13.1.2"
   }
 }
