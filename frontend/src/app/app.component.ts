@@ -8,7 +8,7 @@ import {fromLonLat, transform} from 'ol/proj';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import {Overlay} from '@angular/cdk/overlay';
 import {DetailsComponent} from './details.component';
-import {MatDialog} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
 import {MarkerService} from './marker.service';
 import {forkJoin} from 'rxjs';
 import {UploadService} from './upload.service';

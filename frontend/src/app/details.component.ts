@@ -1,9 +1,9 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material/dialog';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {UploadService} from './upload.service';
 import {forkJoin} from 'rxjs';
-import {MAT_DIALOG_DATA} from '@angular/material';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {Marker} from './marker';
 import {Upload} from './upload';
 
